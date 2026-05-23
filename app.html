@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Dashboard</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+<div class="box">
+  <h1>Dashboard</h1>
+
+  <p id="balance">Loading balance...</p>
+
+  <button onclick="refreshBalance()">Refresh Balance</button>
+
+  <button onclick="place()">Place $0.20</button>
+  <button onclick="pick()">Pick $0.20</button>
+
+  <button onclick="logout()">Logout</button>
+
+  <p class="footer">PickIt System</p>
+</div>
+
+<script>
+const API = "https://pickit-bskz.onrender.com";
+const user = JSON.parse(localStorage.getItem("user"));
+
+async function refreshBalance() {
+  const res = await fetch(API + "/balance", {
+    method: "POST",
+    headers: {"Content-Type":"application/json"},
+    body: JSON.stringify({ phone: user.phone })
+  });
+
+  const data = await res.json();
+
+  document.getElementById("balance").innerText =
+    "Balance: $" + data.balance;
+}
+
+async function place() {
+  await fetch(API + "/place", {
+    method: "POST",
+    headers: {"Content-Type":"application/json"},
+    body: JSON.stringify({
+      phone: user.phone,
+      choice: "black"
+    })
+  });
+
+  alert("Placed $0.20 game");
+  refreshBalance();
+}
+
+async function pick() {
+  const gameId = prompt("Enter Game ID");
+
+  await fetch(API + "/pick", {
+    method: "POST",
+    headers: {"Content-Type":"application/json"},
+    body: JSON.stringify({
+      phone: user.phone,
+      gameId: gameId,
+      choice: "white"
+    })
+  });
+
+  alert("Game played");
+  refreshBalance();
+}
+
+function logout() {
+  localStorage.removeItem("user");
+  window.location.href = "index.html";
+}
+
+refreshBalance();
+</script>
+
+</body>
+</html>
