@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>PickIt Dashboard</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<div class="box">
+  <h1>Dashboard</h1>
+
+  <p id="balance">Loading balance...</p>
+
+  <button onclick="refreshBalance()">Refresh Balance</button>
+
+  <button onclick="placeGame()">Place $0.20</button>
+
+  <button onclick="logout()">Logout</button>
+
+  <p class="footer">Powered by Takunda Ngonisa</p>
+</div>
+
+<script>
+const API = "https://pickit-bskz.onrender.com";
+
+let user = null;
+
+try {
+  const raw = localStorage.getItem("user");
+  if (raw) {
+    user = JSON.parse(raw);
+  }
+} catch (e) {
+  user = null;
+}
+
+if (!user || !user.phone) {
+  window.location.href = "index.html";
+}
+
+async function refreshBalance() {
+  try {
+    const res = await fetch(API + "/balance", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        phone: user.phone
+      })
+    });
+
+    const data = await res.json();
+
+    document.getElementById("balance").innerText =
+      "Balance: $" + data.balance;
+
+  } catch (e) {
+    document.getElementById("balance").innerText =
+      "Balance unavailable";
+  }
+}
+
+async function placeGame() {
+  try {
+    await fetch(API + "/place", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        phone: user.phone,
+        choice: "black"
+      })
+    });
+
+    alert("Game placed");
+    refreshBalance();
+
+  } catch (e) {
+    alert("Error placing game");
+  }
+}
+
+function logout() {
+  localStorage.removeItem("user");
+  window.location.href = "index.html";
+}
+
+refreshBalance();
+</script>
+
+</body>
+</html>
