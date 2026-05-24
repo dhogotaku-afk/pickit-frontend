@@ -11,7 +11,7 @@
   <h1>Dashboard</h1>
 
   <p id="balance">
-    Loading balance...
+    Balance: $0
   </p>
 
   <button onclick="refreshBalance()">
@@ -52,13 +52,18 @@ try {
 
 }
 
-if (!user || !user.phone) {
-
-  window.location.href = "index.html";
-
-}
+// NO AUTO REDIRECT HERE
 
 async function refreshBalance() {
+
+  if (!user || !user.phone) {
+
+    document.getElementById("balance").innerText =
+      "Please login first";
+
+    return;
+
+  }
 
   try {
 
@@ -80,13 +85,18 @@ async function refreshBalance() {
   } catch (e) {
 
     document.getElementById("balance").innerText =
-      "Balance unavailable";
+      "Server offline";
 
   }
 
 }
 
 async function placeGame() {
+
+  if (!user || !user.phone) {
+    alert("Please login first");
+    return;
+  }
 
   try {
 
@@ -117,7 +127,7 @@ function logout() {
 
   localStorage.removeItem("user");
 
-  window.location.href = "index.html";
+  alert("Logged out");
 
 }
 
